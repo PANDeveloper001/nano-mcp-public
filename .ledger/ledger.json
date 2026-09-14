@@ -9,189 +9,351 @@
       "block": 2,
       "statement": "Seed-based address derivation matches the official Nano example.",
       "test": "tests verify seed->address derivation against official docs.nano.org examples: seed->priv (the-basics blake2b vector), priv->pub and pub->address (key-management key_expand example), plus address encoding against rpc.nano.to account_key ground truth and a live account_key round-trip of a derived SDK account.",
-      "minted": "2026-09-13T23:51:59+00:00"
+      "minted": "2026-09-13T23:51:59+00:00",
+      "scope": [],
+      "oracle": null,
+      "expect": null,
+      "source": null,
+      "version": 1,
+      "grounding": "none"
     },
     {
       "id": "L1",
       "block": 2,
       "statement": "Live balance/history reads work through rpc.nano.to without a local node.",
       "test": "a test posts account_balance to NANO_RPC_URL for a known public account and asserts a numeric raw balance returns.",
-      "minted": "2026-09-13T23:51:59+00:00"
+      "minted": "2026-09-13T23:51:59+00:00",
+      "scope": [],
+      "oracle": null,
+      "expect": null,
+      "source": null,
+      "version": 1,
+      "grounding": "none"
     },
     {
       "id": "L2",
       "block": 3,
       "statement": "A signed send block is accepted and confirms on-chain via rpc.nano.to.",
       "test": "nano_sdk test sends a tiny self-transfer and asserts rpc process returns a block hash later present in account_history.",
-      "minted": "2026-09-13T23:51:59+00:00"
+      "minted": "2026-09-13T23:51:59+00:00",
+      "scope": [],
+      "oracle": null,
+      "expect": null,
+      "source": null,
+      "version": 1,
+      "grounding": "none"
     },
     {
       "id": "L3",
       "block": 3,
       "statement": "The SDK refuses to send more than the wallet holds and never exceeds the 0.01 XNO/day outbound cap.",
       "test": "unit test calls send with amount > balance and with an amount that would breach the daily cap; both raise.",
-      "minted": "2026-09-13T23:51:59+00:00"
+      "minted": "2026-09-13T23:51:59+00:00",
+      "scope": [],
+      "oracle": null,
+      "expect": null,
+      "source": null,
+      "version": 1,
+      "grounding": "none"
     },
     {
       "id": "L4",
       "block": 4,
       "statement": "The server derives a distinct, reproducible one-time payment address per request_id.",
       "test": "test calls the derivation with two request_ids and asserts addresses differ, and repeats one id asserting the same address.",
-      "minted": "2026-09-13T23:52:00+00:00"
+      "minted": "2026-09-13T23:52:00+00:00",
+      "scope": [],
+      "oracle": null,
+      "expect": null,
+      "source": null,
+      "version": 1,
+      "grounding": "none"
     },
     {
       "id": "L5",
       "block": 4,
       "statement": "verify_payment(request_id) approves only after the on-chain send to that address is seen, exactly once.",
       "test": "test drives a send to a derived address then verify_payment returns approved; a second verify_payment for the same id returns spent/not-approved.",
-      "minted": "2026-09-13T23:52:00+00:00"
+      "minted": "2026-09-13T23:52:00+00:00",
+      "scope": [],
+      "oracle": null,
+      "expect": null,
+      "source": null,
+      "version": 1,
+      "grounding": "none"
     },
     {
       "id": "L6",
       "block": 5,
       "statement": "An end-to-end pay-per-call succeeds and is replay-safe (single execution).",
       "test": "probe scenario has one agent pay one service via the SDK and MCP server, then re-calls with the same request_id and observes no double execution.",
-      "minted": "2026-09-13T23:52:00+00:00"
+      "minted": "2026-09-13T23:52:00+00:00",
+      "scope": [],
+      "oracle": null,
+      "expect": null,
+      "source": null,
+      "version": 1,
+      "grounding": "none"
     },
     {
       "id": "L7",
       "block": 5,
       "statement": "External payments are journaled as nano_tx while own accounts are never logged.",
       "test": "a test hits the journal gate: one nano_tx row lands in a scratch journal db for an external payer and zero rows for an account in NANO_AGENT_OWN_ACCOUNTS.",
-      "minted": "2026-09-14T00:58:31+00:00"
+      "minted": "2026-09-14T00:58:31+00:00",
+      "scope": [],
+      "oracle": null,
+      "expect": null,
+      "source": null,
+      "version": 1,
+      "grounding": "none"
     },
     {
       "id": "L8",
       "block": 6,
       "statement": "A USD-priced quote returns an exact XNO amount computed from the MEDIAN of three independent public price sources, and never holds or converts anyone's money.",
       "test": "test calls a pricing function with three injected XNO/USD rates and asserts the returned raw XNO amount equals ceil(usd/median * 10^30); a live network test fetches CoinGecko, CoinPaprika and Kucoin and asserts a numeric USD median returns; the quote path performs no balance change or transfer (pure computation).",
-      "minted": "2026-09-14T01:27:17+00:00"
+      "minted": "2026-09-14T01:27:17+00:00",
+      "scope": [],
+      "oracle": null,
+      "expect": null,
+      "source": null,
+      "version": 1,
+      "grounding": "none"
     },
     {
       "id": "L9",
       "block": 6,
       "statement": "A dollar quote expires in 30 seconds or less.",
       "test": "test mints a quote with an injectable clock at t, asserting expires_at - t <= 30s; a second test advances the clock past expires_at and asserts verify_payment returns status='expired' and does not approve.",
-      "minted": "2026-09-14T01:27:26+00:00"
+      "minted": "2026-09-14T01:27:26+00:00",
+      "scope": [],
+      "oracle": null,
+      "expect": null,
+      "source": null,
+      "version": 1,
+      "grounding": "none"
     },
     {
       "id": "L10",
       "block": 7,
       "statement": "A buyer session spends only under a valid owner-signed, unexpired mandate bound to its own sub-account.",
       "test": "tests/test_buyer.py: a valid mandate authorizes a send; tampered signature, wrong owner key, expired, or mis-bound mandate raise before the client records any process call.",
-      "minted": "2026-09-14T02:08:48+00:00"
+      "minted": "2026-09-14T02:08:48+00:00",
+      "scope": [],
+      "oracle": null,
+      "expect": null,
+      "source": null,
+      "version": 1,
+      "grounding": "none"
     },
     {
       "id": "L11",
       "block": 7,
       "statement": "The buyer SDK enforces a per-session cap, the daily cap, and the balance guard before broadcast.",
       "test": "tests/test_buyer.py: a send over the session cap, over the daily 0.01 XNO cap, or over the on-chain balance raises with no client process call recorded; sending up to the session cap is allowed and recorded.",
-      "minted": "2026-09-14T02:08:56+00:00"
+      "minted": "2026-09-14T02:08:56+00:00",
+      "scope": [],
+      "oracle": null,
+      "expect": null,
+      "source": null,
+      "version": 1,
+      "grounding": "none"
     },
     {
       "id": "L12",
       "block": 8,
       "statement": "Every published scorecard figure is reproduced exactly by rerunning the scorecard build on the published raw data.",
       "test": "tests/test_scorecard.py: test_l13_verify_passes_on_published_raw_data builds then verify() returns ok with no problems; test_l13_verify_detects_figure_drift corrupts a published rail figure and verify() fails; test_cli_build_and_verify_is_reproducible runs 'python -m nano_mcp.scorecard build' then 'verify' via subprocess and asserts exit 0 with 'verify PASS'.",
-      "minted": "2026-09-14T02:55:51+00:00"
+      "minted": "2026-09-14T02:55:51+00:00",
+      "scope": [],
+      "oracle": null,
+      "expect": null,
+      "source": null,
+      "version": 1,
+      "grounding": "none"
     },
     {
       "id": "L13",
       "block": 8,
       "statement": "The scorecard's Nano share counts only external nano receipts plus public x402 counts, own traffic excluded.",
       "test": "tests/test_scorecard.py test_l12_share_counts_only_external_receipts: external_receipts==1 and share==1/(165000000+1) with an own-account row contributing zero; test_l12_own_traffic_adds_exactly_zero_to_share: share==0 for both all-own and empty journal; count_external_receipts returns only external payers.",
-      "minted": "2026-09-14T02:56:00+00:00"
+      "minted": "2026-09-14T02:56:00+00:00",
+      "scope": [],
+      "oracle": null,
+      "expect": null,
+      "source": null,
+      "version": 1,
+      "grounding": "none"
     },
     {
       "id": "L14",
       "block": 10,
       "statement": "P1's x402 exact-on-nano spec is prepared and verified, ready to open only after human approval.",
       "test": "tests/test_x402_draft.py passes (8): the spec at draft/x402/specs/schemes/exact/scheme_exact_nano.md has every required x402 section, its JSON examples parse and agree on network=nano:live/asset=XNO/scheme=exact, it encodes at-least-two-RPC confirmation that fails closed and an exactly-once claim, and pending.md frames the contribution as the exact scheme on the nano network and opens no PR; full suite 86 passed.",
-      "minted": "2026-09-14T04:54:48+00:00"
+      "minted": "2026-09-14T04:54:48+00:00",
+      "scope": [],
+      "oracle": null,
+      "expect": null,
+      "source": null,
+      "version": 1,
+      "grounding": "none"
     },
     {
       "id": "L15",
       "block": 11,
       "statement": "P1's x402 exact-on-nano reference implementation draft is prepared and verified, ready to open only after human approval.",
       "test": "tests/test_x402_draft_refimpl.py passes: the draft TS package at draft/x402/typescript/packages/mechanisms/nano implements the SchemeNetworkClient/Server/Facilitator interfaces (type-checks with 'tsc --noEmit' against the published @x402/core, exercised via subprocess), encodes network=nano:live / asset=XNO / paymentProof 64-hex, fail-closed >=2-independent-RPC verification, an atomic single-use claim, and pending.md frames the reference-implementation contribution and opens no PR; full suite passes.",
-      "minted": "2026-09-14T06:57:18+00:00"
+      "minted": "2026-09-14T06:57:18+00:00",
+      "scope": [],
+      "oracle": null,
+      "expect": null,
+      "source": null,
+      "version": 1,
+      "grounding": "none"
     },
     {
       "id": "L16",
       "block": 12,
       "statement": "The facilitator exposes /supported /verify /settle per the exact-on-nano spec and fails closed unless a proof confirms on at least two independent RPC endpoints.",
       "test": "tests/test_facilitator.py: test_l16_facilitator_exposes_supported_verify_settle; test_l16_verify_confirms_on_two_independent_endpoints; test_l16_fail_closed_when_any_endpoint_errors; test_l16_refuses_less_than_two_endpoints; test_l16_http_get_supported; test_l16_http_post_verify_confirms_on_two_endpoints",
-      "minted": "2026-09-14T08:11:18+00:00"
+      "minted": "2026-09-14T08:11:18+00:00",
+      "scope": [],
+      "oracle": null,
+      "expect": null,
+      "source": null,
+      "version": 1,
+      "grounding": "none"
     },
     {
       "id": "L17",
       "block": 12,
       "statement": "Settle re-verifies on-chain then binds a proof to its request with an atomic single-use claim, so one proof settles exactly once.",
       "test": "tests/test_facilitator.py: test_l17_settle_re_verifies_then_claims_atomically; test_l17_settle_never_trusts_prior_verify; test_l17_claim_store_persists_exactly_once_across_instances; test_l17_concurrent_settles_approve_exactly_once; test_l17_http_post_settle_exactly_once",
-      "minted": "2026-09-14T08:11:34+00:00"
+      "minted": "2026-09-14T08:11:34+00:00",
+      "scope": [],
+      "oracle": null,
+      "expect": null,
+      "source": null,
+      "version": 1,
+      "grounding": "none"
     },
     {
       "id": "L18",
       "block": 13,
       "statement": "The multi-RPC verifier parses the real Nano block_info shape and confirms a real on-chain send on two independent public endpoints.",
       "test": "verify_block_on_independent_endpoints confirms a real confirmed Nano send block on two independent public RPCs with a non-empty payer; an incomplete/malformed node response is refused, not passed.",
-      "minted": "2026-09-14T08:54:07+00:00"
+      "minted": "2026-09-14T08:54:07+00:00",
+      "scope": [],
+      "oracle": null,
+      "expect": null,
+      "source": null,
+      "version": 1,
+      "grounding": "none"
     },
     {
       "id": "L19",
       "block": 14,
       "statement": "The nano exact resource server returns HTTP 402 with a payment-required header then serves the protected result once its payment proof is settled",
       "test": "tests/test_httpx402.py drives a real in-process HTTP server: the first GET returns 402 with a payment-required header carrying the nano exact requirement (scheme exact, network nano:live, asset XNO, a one-time nano_ payTo and the exact raw amount), and after the client retries with a payment-signature payload that the facilitator verifies then settles the server returns 200 with the protected result and a payment-response header; a wire client pay_and_fetch completes the two-request dance. Full suite 130 passes.",
-      "minted": "2026-09-14T09:47:08+00:00"
+      "minted": "2026-09-14T09:47:08+00:00",
+      "scope": [],
+      "oracle": null,
+      "expect": null,
+      "source": null,
+      "version": 1,
+      "grounding": "none"
     },
     {
       "id": "L20",
       "block": 14,
       "statement": "A spent payment proof is refused so one payment never serves the resource twice",
       "test": "tests/test_httpx402.py replays the same spent payment-signature header a second time and asserts HTTP 402 with the protected result absent, because the facilitator's atomic single-use claim consumes the one proof exactly once.",
-      "minted": "2026-09-14T09:47:08+00:00"
+      "minted": "2026-09-14T09:47:08+00:00",
+      "scope": [],
+      "oracle": null,
+      "expect": null,
+      "source": null,
+      "version": 1,
+      "grounding": "none"
     },
     {
       "id": "L21",
       "block": 15,
       "statement": "The MCP paidTool wrapper refuses a spent or replayed payment proof, so one payment never serves a protected tool result twice.",
       "test": "tests/test_paidtool.py: calling paid_tool_execute twice with the same request_id/paymentProof returns ok on the first and refused on the second, and the second returns no protected result \u2014 the facilitator's atomic single-use claim consumes the proof exactly once across MCP calls.",
-      "minted": "2026-09-14T10:09:50+00:00"
+      "minted": "2026-09-14T10:09:50+00:00",
+      "scope": [],
+      "oracle": null,
+      "expect": null,
+      "source": null,
+      "version": 1,
+      "grounding": "none"
     },
     {
       "id": "L22",
       "block": 15,
       "statement": "The paidTool wrapper issues a one-time nano payTo then serves the result only after the proof is verified and settled on two RPCs.",
       "test": "tests/test_paidtool.py drives the real MCPServer in-process (mcp v2): paid_tool_request returns a distinct one-time nano_ payTo + exact amount per call; paid_tool_execute with a 64-hex proof the stub nodes confirm on both endpoints returns the protected result exactly once; fail-closed when one of two endpoints errors; wrong amount or missing requestId refused. Full suite 130+ passes.",
-      "minted": "2026-09-14T10:09:57+00:00"
+      "minted": "2026-09-14T10:09:57+00:00",
+      "scope": [],
+      "oracle": null,
+      "expect": null,
+      "source": null,
+      "version": 1,
+      "grounding": "none"
     },
     {
       "id": "L23",
       "block": 16,
       "statement": "The scorecard's nano share is computed from the real nano-pulse journal DB, reproduces exactly on rerun, and Rai's own accounts add zero.",
       "test": "scorecard build --journal-db <real journal.db> computes share from nano_tx rows with payer outside NANO_AGENT_OWN_ACCOUNTS; verify on the same DB reproduces published.json; hand-written --journal output no longer inflates the figure.",
-      "minted": "2026-09-14T12:17:26+00:00"
+      "minted": "2026-09-14T12:17:26+00:00",
+      "scope": [],
+      "oracle": null,
+      "expect": null,
+      "source": null,
+      "version": 1,
+      "grounding": "none"
     },
     {
       "id": "L24",
       "block": 17,
       "statement": "Wallet.receive builds+signs a valid state receive block and picks the correct PoW work root: account public key for an open block, previous frontier otherwise.",
       "test": "tests/test_wallet.py test_receive_publishes_receive_block_and_increases_balance (subtype=receive, link=source, balance=old+received); test_receive_open_account_uses_account_public_key_as_work_root (work_generate hash == account public key when frontier all-zero, previous=0x64); tests/test_block.py docs receive vector hash+signature reproduce byte-for-byte.",
-      "minted": "2026-09-14T16:43:01+00:00"
+      "minted": "2026-09-14T16:43:01+00:00",
+      "scope": [],
+      "oracle": null,
+      "expect": null,
+      "source": null,
+      "version": 1,
+      "grounding": "none"
     },
     {
       "id": "L25",
       "block": 18,
       "statement": "A new public repo holds a single-commit archive snapshot free of seeds, keys and .db files, private repo untouched.",
       "test": "snapshot has 1 commit; secret scan == 0 on snapshot and remote clone; private HEAD unchanged",
-      "minted": "2026-09-14T17:14:40+00:00"
+      "minted": "2026-09-14T17:14:40+00:00",
+      "scope": [],
+      "oracle": null,
+      "expect": null,
+      "source": null,
+      "version": 1,
+      "grounding": "none"
     },
     {
       "id": "L26",
       "block": 18,
       "statement": "The public package builds a wheel from the archive snapshot and offline tests pass.",
       "test": "python -m build produces dist/*.whl from snapshot; pytest -m 'not network' == 0 failures",
-      "minted": "2026-09-14T17:14:49+00:00"
+      "minted": "2026-09-14T17:14:49+00:00",
+      "scope": [],
+      "oracle": null,
+      "expect": null,
+      "source": null,
+      "version": 1,
+      "grounding": "none"
     }
   ],
   "blocks": {
@@ -5733,5 +5895,7 @@
       }
     ],
     "at": "2026-09-14T17:03:24+00:00"
-  }
+  },
+  "waivers": [],
+  "contested": []
 }
