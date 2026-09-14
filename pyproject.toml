@@ -1,0 +1,27 @@
+[project]
+name = "nano-mcp"
+version = "0.1.0"
+description = "MCP server + SDK so any AI agent can hold XNO (Nano) and pay per API call, transacting through rpc.nano.to."
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "httpx>=0.24",
+    "ed25519-blake2b-fork>=1.4",
+    "mcp>=1.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=7"]
+
+[tool.setuptools.packages.find]
+include = ["nano_sdk*", "nano_mcp*"]
+exclude = ["tests*", "tools*", "scorecard*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+# Blocks 10/11 (P1 x402 spec + refimpl drafts) were withdrawn as duplicates of
+# x402nano/exact and pursekeeper/x402-nano-exact (AGENTS.md gate 3). Their tests
+# observe withdrawn draft artifacts that are intentionally not part of this
+# public release, so they are excluded from the released suite.
+addopts = "--ignore=tests/test_x402_draft.py --ignore=tests/test_x402_draft_refimpl.py"
+markers = ["network: tests that hit the live rpc.nano.to node"]
