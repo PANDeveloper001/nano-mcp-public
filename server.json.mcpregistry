@@ -18,8 +18,8 @@
       },
       "environmentVariables": [
         {
-          "name": "NANO_MCP_SECRET",
-          "description": "Master secret (hex) used to derive a one-time payment address per request. Generate one locally; it is the only secret the server needs and it is never sent anywhere.",
+          "name": "NANO_PAYMENT_MASTER_SECRET",
+          "description": "Master secret (32+ bytes hex) used to derive a one-time payment address per request. Generate one locally; it never leaves the server.",
           "isRequired": true,
           "isSecret": true
         },

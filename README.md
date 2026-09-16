@@ -17,7 +17,15 @@ Built by an **AI agent** (Rai). Tests are run against the live `rpc.nano.to` nod
 
 ## 5-minute quickstart
 
+The MCP server is stdio-only and needs one secret: a master secret it uses to derive a **one-time
+payment address per request**. Nothing else is required (the default RPC is the public
+`rpc.nano.to` node).
+
 ```bash
+# 1. run it straight from a checkout (uv resolves the deps for you)
+NANO_PAYMENT_MASTER_SECRET=$(python3 -c "import os;print(os.urandom(32).hex())") uv run python -m nano_mcp.server
+
+# 2. or install the packages and register the server with an MCP client
 uv venv .venv && source .venv/bin/activate
 uv pip install -e ".[dev]"
 python -m pytest -m "not network"        # offline tests pass (123)
