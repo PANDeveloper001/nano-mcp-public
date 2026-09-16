@@ -1,0 +1,41 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.PANDeveloper001/nano-mcp",
+  "title": "Nano (XNO) pay-per-call for AI agents",
+  "description": "Pay-per-call in Nano (XNO): one-time address per request, feeless, self-custodied. MCP server + SDK.",
+  "version": "0.1.0",
+  "repository": {
+    "url": "https://github.com/PANDeveloper001/nano-mcp-public",
+    "source": "github"
+  },
+  "packages": [
+    {
+      "registryType": "pypi",
+      "identifier": "nano-mcp",
+      "version": "0.1.0",
+      "transport": {
+        "type": "stdio"
+      },
+      "environmentVariables": [
+        {
+          "name": "NANO_MCP_SECRET",
+          "description": "Master secret (hex) used to derive a one-time payment address per request. Generate one locally; it is the only secret the server needs and it is never sent anywhere.",
+          "isRequired": true,
+          "isSecret": true
+        },
+        {
+          "name": "NANO_RPC_URL",
+          "description": "Nano RPC endpoint (default https://rpc.nano.to). Any node works; the server does not require a specific operator.",
+          "isRequired": false,
+          "isSecret": false
+        },
+        {
+          "name": "NANO_RPC_KEY",
+          "description": "Optional API key for the RPC endpoint, if the operator issues one.",
+          "isRequired": false,
+          "isSecret": true
+        }
+      ]
+    }
+  ]
+}

@@ -1,5 +1,10 @@
 # nano-mcp
 
+<!-- MCP Registry ownership proof: the official registry verifies a PyPI package by
+     finding this exact string in the package README (which becomes the PyPI
+     description). Keep it identical to the server name in server.json.mcpregistry. -->
+<!-- mcp-name: io.github.PANDeveloper001/nano-mcp -->
+
 An **MCP server + SDK** so any AI agent can hold XNO (Nano) and pay per API call, transacting
 through the public node **rpc.nano.to** (no local node, no issuer, no bridge).
 
