@@ -26,9 +26,9 @@
    "test": "a test posts account_balance to NANO_RPC_URL for a known public account and asserts a numeric raw balance returns.",
    "minted": "2026-09-13T23:51:59+00:00",
    "scope": [
-    "tests/test_wallet.py"
+    "tests/test_client.py"
    ],
-   "oracle": "cd /root/work/nano-mcp-public && .venv/bin/python -m pytest tests/test_wallet.py -x --tb=short -k 'balance or history' 2>&1",
+   "oracle": "cd /root/work/nano-mcp-public && .venv/bin/python -m pytest tests/test_client.py -x --tb=short -k \"balance or history\" 2>&1",
    "expect": ".*passed.*",
    "source": null,
    "version": 2,
@@ -213,6 +213,42 @@
      "coverage_gaps": [],
      "injection": [],
      "at": "2026-09-17T14:45:13+00:00"
+    },
+    {
+     "kind": "verify",
+     "ok": false,
+     "refusable": true,
+     "results": [
+      {
+       "id": "L0",
+       "pass": true,
+       "oracle_exit": 0,
+       "oracle_ok": true,
+       "mutants": {
+        "total": 0,
+        "killed": 0
+       },
+       "judge": "deepseek/deepseek-v4-flash-0731",
+       "control": "passed"
+      },
+      {
+       "id": "L1",
+       "pass": false,
+       "oracle_exit": 0,
+       "oracle_ok": true,
+       "mutants": {
+        "total": 0,
+        "killed": 0
+       },
+       "judge": "deepseek/deepseek-v4-flash-0731",
+       "control": "passed"
+      }
+     ],
+     "pre_sig": "6dd85d80b8be7989cbeb5530d2c951bf981632af87cc5b911c98bf2a10eb22ae",
+     "tier": "cheap",
+     "coverage_gaps": [],
+     "injection": [],
+     "at": "2026-09-17T14:47:22+00:00"
     }
    ]
   }
@@ -480,6 +516,16 @@
    "at": "2026-09-17T14:45:13+00:00",
    "prev": "e327aa195acd35ba5b9686cf09ba71a02c68bc09289a2c1aff838479baa8f918",
    "receipt": "70c6e512635fd771d67b83860d63bdf649c7d94a45fa04ab71e741856c0e4050"
+  },
+  {
+   "kind": "verify",
+   "payload": {
+    "block": "2",
+    "ok": false
+   },
+   "at": "2026-09-17T14:47:22+00:00",
+   "prev": "70c6e512635fd771d67b83860d63bdf649c7d94a45fa04ab71e741856c0e4050",
+   "receipt": "47d0a19ff0e10414d8b885ecec5954411354edc65a1578e7287ed480ef252228"
   }
  ]
 }
