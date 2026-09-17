@@ -1,287 +1,485 @@
 {
-  "goal": "nano-mcp: an MCP server + small SDK so any AI agent can hold XNO and pay per API call in Nano, through rpc.nano.to",
-  "repo": "/root/nano-agent/nano-mcp",
-  "created": "2026-09-13T23:35:06+00:00",
-  "base_commit": "HEAD",
-  "laws": [
+ "goal": "nano-mcp: an MCP server + small SDK so any AI agent can hold XNO and pay per API call in Nano, through rpc.nano.to",
+ "repo": "/root/nano-agent/nano-mcp",
+ "created": "2026-09-13T23:35:06+00:00",
+ "base_commit": "HEAD",
+ "laws": [
+  {
+   "id": "L0",
+   "block": 2,
+   "statement": "Seed-based address derivation matches the official Nano example.",
+   "test": "tests verify seed->address derivation against official docs.nano.org examples: seed->priv (the-basics blake2b vector), priv->pub and pub->address (key-management key_expand example), plus address encoding against rpc.nano.to account_key ground truth and a live account_key round-trip of a derived SDK account.",
+   "minted": "2026-09-13T23:51:59+00:00",
+   "scope": [
+    "tests/test_crypto.py"
+   ],
+   "oracle": "cd /root/work/nano-mcp-public && .venv/bin/python -m pytest tests/test_crypto.py -x --tb=short 2>&1",
+   "expect": ".*passed.*",
+   "source": null,
+   "version": 3,
+   "grounding": "none"
+  },
+  {
+   "id": "L1",
+   "block": 2,
+   "statement": "Live balance/history reads work through rpc.nano.to without a local node.",
+   "test": "a test posts account_balance to NANO_RPC_URL for a known public account and asserts a numeric raw balance returns.",
+   "minted": "2026-09-13T23:51:59+00:00",
+   "scope": [
+    "tests/test_wallet.py"
+   ],
+   "oracle": "cd /root/work/nano-mcp-public && .venv/bin/python -m pytest tests/test_wallet.py -x --tb=short -k 'balance or history' 2>&1",
+   "expect": ".*passed.*",
+   "source": null,
+   "version": 2,
+   "grounding": "none"
+  }
+ ],
+ "blocks": {
+  "2": {
+   "status": "split-required",
+   "attempts": [
     {
-      "id": "L0",
-      "block": 2,
-      "statement": "Seed-based address derivation matches the official Nano example.",
-      "test": "tests verify seed->address derivation against official docs.nano.org examples: seed->priv (the-basics blake2b vector), priv->pub and pub->address (key-management key_expand example), plus address encoding against rpc.nano.to account_key ground truth and a live account_key round-trip of a derived SDK account.",
-      "minted": "2026-09-13T23:51:59+00:00",
-      "scope": [],
-      "oracle": null,
-      "expect": null,
-      "source": null,
-      "version": 1,
-      "grounding": "none"
+     "kind": "verify",
+     "ok": false,
+     "results": [
+      {
+       "id": "L0",
+       "pass": false,
+       "evidence": "tests/test_crypto.py lines 39-41 only assert the private key derivation: `assert priv.hex().upper() == DOCS_PRIV`; there is no test asserting the derived nano_ address equals a docs.nano.org example address. The DOCS_SEED is defined but no address from the docs example is asserted. Missing: a test like `assert derive_account(DOCS_SEED, index=1).address == 'nano_...'`."
+      },
+      {
+       "id": "L1",
+       "pass": true,
+       "evidence": "tests/test_client.py lines 22-28: `b = client.account_balance(\"nano_1faucet7b6xjyha7m13objpn5ubkquzd6ska8kwopzf1ecbfmn35d1zey3ys\")` then `raw = b[\"balance\"]` and `assert raw.isdigit()` and `assert int(raw) > 0`; pytest output /tmp/pytest-net.txt: `tests/test_client.py::test_live_balance_read PASSED`."
+      }
+     ],
+     "at": "2026-09-13T23:55:41+00:00"
     },
     {
-      "id": "L1",
-      "block": 2,
-      "statement": "Live balance/history reads work through rpc.nano.to without a local node.",
-      "test": "a test posts account_balance to NANO_RPC_URL for a known public account and asserts a numeric raw balance returns.",
-      "minted": "2026-09-13T23:51:59+00:00",
-      "scope": [],
-      "oracle": null,
-      "expect": null,
-      "source": null,
-      "version": 1,
-      "grounding": "none"
-    }
-  ],
-  "blocks": {
-    "2": {
-      "status": "pass",
-      "attempts": [
-        {
-          "kind": "verify",
-          "ok": false,
-          "results": [
-            {
-              "id": "L0",
-              "pass": false,
-              "evidence": "tests/test_crypto.py lines 39-41 only assert the private key derivation: `assert priv.hex().upper() == DOCS_PRIV`; there is no test asserting the derived nano_ address equals a docs.nano.org example address. The DOCS_SEED is defined but no address from the docs example is asserted. Missing: a test like `assert derive_account(DOCS_SEED, index=1).address == 'nano_...'`."
-            },
-            {
-              "id": "L1",
-              "pass": true,
-              "evidence": "tests/test_client.py lines 22-28: `b = client.account_balance(\"nano_1faucet7b6xjyha7m13objpn5ubkquzd6ska8kwopzf1ecbfmn35d1zey3ys\")` then `raw = b[\"balance\"]` and `assert raw.isdigit()` and `assert int(raw) > 0`; pytest output /tmp/pytest-net.txt: `tests/test_client.py::test_live_balance_read PASSED`."
-            }
-          ],
-          "at": "2026-09-13T23:55:41+00:00"
-        },
-        {
-          "kind": "verify",
-          "ok": false,
-          "results": [
-            {
-              "id": "L0",
-              "pass": false,
-              "evidence": "tests/test_crypto.py defines DOCS_SEED and DOCS_PRIV (lines 35-36) and test_private_key_derivation_matches_official_vector (lines 44-46) asserts derive_private_key(DOCS_SEED, index=1) == DOCS_PRIV. Separate docs vectors are used for public-key/address expansion (lines 39-41, 49-56), but no test derives an Account from DOCS_SEED and asserts its .address equals an official nano_ address. Missing: explicit test that derive_account(DOCS_SEED, index) produces the docs.nano.org example address."
-            },
-            {
-              "id": "L1",
-              "pass": true,
-              "evidence": "tests/test_client.py:23-28 test_live_balance_read calls client.account_balance on nano_1faucet... and asserts raw.isdigit() and int(raw)>0. tests/test_client.py:31-34 test_live_history_read calls account_history. pytest output /tmp/pytest-net.txt shows 'tests/test_client.py::test_live_balance_read PASSED' and '3 passed in 1.11s', proving the live RPC read succeeded through NANO_RPC_URL."
-            }
-          ],
-          "at": "2026-09-13T23:56:43+00:00"
-        },
-        {
-          "kind": "verify",
-          "ok": true,
-          "results": [
-            {
-              "id": "L0",
-              "pass": true,
-              "evidence": "tests/test_crypto.py:44-46 test_private_key_derivation_matches_official_vector asserts derive_private_key(DOCS_SEED, index=1) == DOCS_PRIV (docs.nano.org the-basics blake2b vector). tests/test_crypto.py:49-51 test_public_key_derivation_matches_docs_keyexpand asserts public_key(DOCS_PRIV_EXPAND) == DOCS_PUB_EXPAND (key_expand priv->pub). tests/test_crypto.py:54-56 test_address_matches_docs_keyexpand asserts address_from_public_key(DOCS_PUB_EXPAND) == DOCS_ADDR_EXPAND (key_expand pub->address). tests/test_crypto.py:59-61 test_address_encoding_matches_node asserts address_from_public_key matches NODE_PAIRS ground truth from rpc.nano.to account_key. tests/test_client.py:38-47 test_derived_account_agrees_with_node derives a random-seed account and asserts rpc.nano.to account_key returns the same public key; pytest output shows 'tests/test_client.py::test_derived_account_agrees_with_node PASSED [100%]'."
-            },
-            {
-              "id": "L1",
-              "pass": true,
-              "evidence": "tests/test_client.py:23-28 test_live_balance_read calls client.account_balance('nano_1faucet...') and asserts raw.isdigit() and int(raw)>0. tests/test_client.py:32-34 test_live_history_read calls client.account_history and asserts len(history)>=1. pytest output shows 'tests/test_client.py::test_live_balance_read PASSED [ 50%]' and 'tests/test_client.py::test_live_history_read PASSED [ 75%]'."
-            }
-          ],
-          "at": "2026-09-13T23:57:27+00:00"
-        }
-      ]
-    }
-  },
-  "deltas": [
-    {
-      "block": 2,
-      "text": "L0.test: docs publish seed->priv (the-basics) and priv->pub->address (key_expand) as SEPARATE vectors, no single seed->address example; so the law's original test wording (derive then compare to one docs seed/address) was unachievable. Corrected test wording to the piecewise chain of official vectors the tests actually assert. No change to the law statement.",
-      "at": "2026-09-13T23:56:59+00:00"
-    }
-  ],
-  "probe": {
-    "score": 96,
-    "results": [
+     "kind": "verify",
+     "ok": false,
+     "results": [
       {
-        "id": "L0",
-        "pass": true,
-        "evidence": "tests/test_crypto.py:46 assert priv.hex().upper() == DOCS_PRIV; :51 assert public_key(DOCS_PRIV_EXPAND).hex().upper() == DOCS_PUB_EXPAND; :56 assert address_from_public_key(bytes.fromhex(DOCS_PUB_EXPAND)) == DOCS_ADDR_EXPAND; tests/test_client.py:47 assert node_key.lower() == acct.public_key.hex()"
+       "id": "L0",
+       "pass": false,
+       "evidence": "tests/test_crypto.py defines DOCS_SEED and DOCS_PRIV (lines 35-36) and test_private_key_derivation_matches_official_vector (lines 44-46) asserts derive_private_key(DOCS_SEED, index=1) == DOCS_PRIV. Separate docs vectors are used for public-key/address expansion (lines 39-41, 49-56), but no test derives an Account from DOCS_SEED and asserts its .address equals an official nano_ address. Missing: explicit test that derive_account(DOCS_SEED, index) produces the docs.nano.org example address."
       },
       {
-        "id": "L1",
-        "pass": true,
-        "evidence": "tests/test_client.py:27 assert int(raw) > 0"
-      },
-      {
-        "id": "L2",
-        "pass": false,
-        "evidence": "Missing: no test sends a tiny self-transfer and confirms on-chain via rpc.nano.to; probe marks L2 STUCK (no funded wallet, AGENTS forbids seeking funds)."
-      },
-      {
-        "id": "L3",
-        "pass": true,
-        "evidence": "tests/test_wallet.py:63 with pytest.raises(InsufficientBalance); :78 with pytest.raises(DailyCapExceeded)"
-      },
-      {
-        "id": "L4",
-        "pass": true,
-        "evidence": "tests/test_payments.py:61 assert a != b; :68 assert a1 == a2"
-      },
-      {
-        "id": "L5",
-        "pass": true,
-        "evidence": "tests/test_payments.py:102 assert res[\"status\"] == \"approved\"; :107 assert res2[\"status\"] == \"spent\"; :108 assert svc.store.is_approved(rid); :117 assert svc.verify_payment(rid, amt)[\"status\"] == \"pending\"; :156 assert results.count(\"approved\") == 1"
-      },
-      {
-        "id": "L6",
-        "pass": true,
-        "evidence": "tests/test_probe.py:93 assert '\"approved\"' in v1text; :99 assert '\"spent\"' in uvtext"
-      },
-      {
-        "id": "L7",
-        "pass": true,
-        "evidence": "tests/test_evidence.py:39 assert should_log(EXT, own) is True; :72 assert _count_tx(db) == 0; tests/test_probe.py:106 assert log_ext is True; :107 assert log_own is False"
-      },
-      {
-        "id": "L8",
-        "pass": true,
-        "evidence": "tests/test_pricing.py:111 assert q.price_raw == usd_to_xno_raw(Decimal(\"1.00\"), Decimal(\"0.34\")); :159 assert not spy.contacted, \"quote_usd must not touch the chain\"; :220 assert len(rates) == 3; :224 assert min(rates) <= m <= max(rates)"
-      },
-      {
-        "id": "L9",
-        "pass": true,
-        "evidence": "tests/test_pricing.py:174 assert q.expires_at - 5000.0 <= 30.0; :193 assert out[\"status\"] == \"expired\"; :195 assert not store.is_approved(\"req-exp\")"
-      },
-      {
-        "id": "L10",
-        "pass": true,
-        "evidence": "tests/test_buyer.py:96 assert len(wallet.client.process_calls()) == 1; :107 assert client.process_calls() == []; :113 with pytest.raises(MandateError); :123 with pytest.raises(ExpiredMandate); :134 with pytest.raises(MandateError)"
-      },
-      {
-        "id": "L11",
-        "pass": true,
-        "evidence": "tests/test_buyer.py:145 assert client.process_calls() == []; :155 assert client.process_calls() == []; :165 assert client.process_calls() == []; :173 assert len(client.process_calls()) == 1"
-      },
-      {
-        "id": "L12",
-        "pass": true,
-        "evidence": "tests/test_scorecard.py:175 assert \"verify PASS\" in rv.stdout; :112 assert problems == []; :120 ok, problems = verify(RAW, _write_published(published), j, _own()); :121 assert ok is False"
-      },
-      {
-        "id": "L13",
-        "pass": true,
-        "evidence": "tests/test_scorecard.py:71 expected_share = 1 / (165_000_000 + 1); :72 assert published[\"nano\"][\"share_of_observed\"] == pytest.approx(expected_share); :82 assert p_own[\"nano\"][\"share_of_observed\"] == p_empty[\"nano\"][\"share_of_observed\"] == 0.0; :102 assert [r[\"payer\"] for r in receipts] == [EXT]"
-      },
-      {
-        "id": "L14",
-        "pass": true,
-        "evidence": "tests/test_x402_draft.py:52 assert SPEC.is_file(); :77 assert acc[\"network\"] == \"nano:live\"; :90 assert \"at least two independent\" in flat and \"RPC endpoints\" in flat; :96 assert \"claim\" in text.lower() and \"exactly once\" in text.lower(); :103 # withdrawn. The spec draft still exists; :114 assert \"PR opened\" not in text or \"withdrawn\" in text"
-      },
-      {
-        "id": "L15",
-        "pass": true,
-        "evidence": "tests/test_x402_draft_refimpl.py:65 assert re.search(r\"implements SchemeNetworkClient\", texts[\"client\"]); :66 assert re.search(r\"implements SchemeNetworkServer\", texts[\"server\"]); :67 assert re.search(r\"implements SchemeNetworkFacilitator\", texts[\"facilitator\"]); :87 assert \"fails closed\" in flat.lower() or \"fail closed\" in flat.lower(); :96 assert \"claimStore.claim\" in fac; :114 assert \"error TS\" not in r.stdout; :132 assert \"PR opened\" not in text or \"withdrawn\" in text"
-      },
-      {
-        "id": "L16",
-        "pass": true,
-        "evidence": "tests/test_facilitator.py:127 assert fac.supported()[\"scheme\"] == \"exact\"; :128 assert fac.supported()[\"network\"] == \"nano:live\"; :131 assert callable(fac.verify) and callable(fac.settle); :311 assert r.status_code == 200; :314 assert body[\"network\"] == \"nano:live\"; :139 assert res[\"extra\"][\"confirmedOn\"] == 2; :149 # fail-closed; :162 assert \"fail-closed\" in res[\"invalidMessage\"]; :322 assert r.json()[\"isValid\"] is True"
-      },
-      {
-        "id": "L17",
-        "pass": true,
-        "evidence": "tests/test_facilitator.py:215 assert s1[\"success\"] is True; :254 assert s[\"errorReason\"] == \"unconfirmed\"; :257 def test_l17_claim_store_persists_exactly_once_across_instances; :282 assert results.count(True) == 1; :334 assert s2[\"errorReason\"] == \"duplicate\""
-      },
-      {
-        "id": "L18",
-        "pass": true,
-        "evidence": "tests/test_facilitator_live.py:157 assert res.confirmed_on == 2; :156 assert res.ok is True, f\"live 2-RPC verification failed: {res.reason}\"; :158 assert res.consulted == 2; :128 assert res.ok is False"
-      },
-      {
-        "id": "L19",
-        "pass": true,
-        "evidence": "tests/test_httpx402.py:180 assert first.status_code == 402; :181 assert PAYMENT_REQUIRED_HEADER in first.headers; :195 assert second.status_code == 200; :196 assert '\"the protected result\"' in second.text; :199 assert settle[\"success\"] is True"
-      },
-      {
-        "id": "L20",
-        "pass": true,
-        "evidence": "tests/test_httpx402.py:242 assert replay.status_code == 402; :243 assert \"the protected result\" not in replay.text"
-      },
-      {
-        "id": "L21",
-        "pass": true,
-        "evidence": "tests/test_paidtool.py:206 assert second[\"success\"] is False; :207 assert \"result\" not in second; :201 assert first[\"success\"] is True"
-      },
-      {
-        "id": "L22",
-        "pass": true,
-        "evidence": "tests/test_paidtool.py:181 assert out[\"result\"][\"data\"] == \"the protected tool result\"; :182 assert out[\"settlement\"][\"success\"] is True; :129 assert r1[\"pay_to\"] != r2[\"pay_to\"]; :130 assert r1[\"pay_to\"].startswith(\"nano_\"); :222 assert out[\"success\"] is False; :240 assert out[\"success\"] is False; :257 assert out[\"success\"] is False"
-      },
-      {
-        "id": "L23",
-        "pass": true,
-        "evidence": "tests/test_journaldb.py:62 assert rows[0][\"payer\"] == EXT; :57 assert ok_ext is True and ok_own is False; :79 assert [r[\"payer\"] for r in receipts] == [EXT]; :92 assert published[\"nano\"][\"external_receipts\"] == 1; :123 assert \"verify PASS\" in rv.stdout; :140 with pytest.raises(sqlite3.OperationalError)"
-      },
-      {
-        "id": "L24",
-        "pass": true,
-        "evidence": "tests/test_wallet.py:126 assert proc[\"subtype\"] == \"receive\"; :127 assert proc[\"block\"][\"link\"] == src.upper(); :129 assert proc[\"block\"][\"balance\"] == str(...); :158 assert wg[\"hash\"] == acct.public_key.hex(); :161 assert proc[\"block\"][\"previous\"] == \"0\" * 64; tests/test_block.py:55 assert h.hex().upper() == expected_hash; tests/test_wallet.py:139 with pytest.raises(ValueError)"
+       "id": "L1",
+       "pass": true,
+       "evidence": "tests/test_client.py:23-28 test_live_balance_read calls client.account_balance on nano_1faucet... and asserts raw.isdigit() and int(raw)>0. tests/test_client.py:31-34 test_live_history_read calls account_history. pytest output /tmp/pytest-net.txt shows 'tests/test_client.py::test_live_balance_read PASSED' and '3 passed in 1.11s', proving the live RPC read succeeded through NANO_RPC_URL."
       }
-    ],
-    "at": "2026-09-14T17:03:24+00:00"
-  },
-  "waivers": [],
-  "contested": [],
-  "events": [
+     ],
+     "at": "2026-09-13T23:56:43+00:00"
+    },
     {
-      "kind": "owner_cleanup",
-      "payload": {
-        "blocks": [
-          "3",
-          "4",
-          "5",
-          "6",
-          "7",
-          "8",
-          "10",
-          "11",
-          "12",
-          "13",
-          "14",
-          "15",
-          "16",
-          "17",
-          "18"
-        ],
-        "laws": [
-          "L2",
-          "L3",
-          "L4",
-          "L5",
-          "L6",
-          "L7",
-          "L8",
-          "L9",
-          "L10",
-          "L11",
-          "L12",
-          "L13",
-          "L14",
-          "L15",
-          "L16",
-          "L17",
-          "L18",
-          "L19",
-          "L20",
-          "L21",
-          "L22",
-          "L23",
-          "L24",
-          "L25",
-          "L26"
-        ],
-        "reason": "Owner 2026-09-15: old Nano-internal milestones removed; Rai works outside the Nano ecosystem, reusing existing hub.nano.org tools."
+     "kind": "verify",
+     "ok": true,
+     "results": [
+      {
+       "id": "L0",
+       "pass": true,
+       "evidence": "tests/test_crypto.py:44-46 test_private_key_derivation_matches_official_vector asserts derive_private_key(DOCS_SEED, index=1) == DOCS_PRIV (docs.nano.org the-basics blake2b vector). tests/test_crypto.py:49-51 test_public_key_derivation_matches_docs_keyexpand asserts public_key(DOCS_PRIV_EXPAND) == DOCS_PUB_EXPAND (key_expand priv->pub). tests/test_crypto.py:54-56 test_address_matches_docs_keyexpand asserts address_from_public_key(DOCS_PUB_EXPAND) == DOCS_ADDR_EXPAND (key_expand pub->address). tests/test_crypto.py:59-61 test_address_encoding_matches_node asserts address_from_public_key matches NODE_PAIRS ground truth from rpc.nano.to account_key. tests/test_client.py:38-47 test_derived_account_agrees_with_node derives a random-seed account and asserts rpc.nano.to account_key returns the same public key; pytest output shows 'tests/test_client.py::test_derived_account_agrees_with_node PASSED [100%]'."
       },
-      "at": "2026-09-14T22:18:12+00:00",
-      "prev": "genesis",
-      "receipt": "291a705034f83653e2c06c417dc653e9f6c2059ec95ebc50e32b09cac02559f7"
+      {
+       "id": "L1",
+       "pass": true,
+       "evidence": "tests/test_client.py:23-28 test_live_balance_read calls client.account_balance('nano_1faucet...') and asserts raw.isdigit() and int(raw)>0. tests/test_client.py:32-34 test_live_history_read calls client.account_history and asserts len(history)>=1. pytest output shows 'tests/test_client.py::test_live_balance_read PASSED [ 50%]' and 'tests/test_client.py::test_live_history_read PASSED [ 75%]'."
+      }
+     ],
+     "at": "2026-09-13T23:57:27+00:00"
+    },
+    {
+     "kind": "verify",
+     "ok": false,
+     "refusable": true,
+     "results": [
+      {
+       "id": "L0",
+       "pass": false,
+       "oracle_exit": 1,
+       "oracle_ok": false,
+       "cached": true,
+       "judge": "deepseek/deepseek-v4-flash-0731",
+       "control": "passed"
+      },
+      {
+       "id": "L1",
+       "pass": false,
+       "oracle_exit": 1,
+       "oracle_ok": false,
+       "cached": true,
+       "judge": "deepseek/deepseek-v4-flash-0731",
+       "control": "passed"
+      }
+     ],
+     "pre_sig": "018b491fe455122aece8fccc95520d2034f30f8add1def9708ec827b1f0eab8f",
+     "tier": "cheap",
+     "coverage_gaps": [],
+     "injection": [],
+     "at": "2026-09-17T14:31:48+00:00"
+    },
+    {
+     "kind": "verify",
+     "ok": false,
+     "refusable": true,
+     "results": [
+      {
+       "id": "L0",
+       "pass": false,
+       "oracle_exit": 0,
+       "oracle_ok": true,
+       "mutants": {
+        "total": 0,
+        "killed": 0
+       },
+       "judge": "deepseek/deepseek-v4-flash-0731",
+       "control": "passed"
+      },
+      {
+       "id": "L1",
+       "pass": false,
+       "oracle_exit": 0,
+       "oracle_ok": true,
+       "mutants": {
+        "total": 0,
+        "killed": 0
+       },
+       "judge": "deepseek/deepseek-v4-flash-0731",
+       "control": "passed"
+      }
+     ],
+     "pre_sig": "5e8b166e938919ac5694c2e5517fa2bd1a002299bdaccba2f791d647195cfec0",
+     "tier": "cheap",
+     "coverage_gaps": [],
+     "injection": [],
+     "at": "2026-09-17T14:39:45+00:00"
+    },
+    {
+     "kind": "verify",
+     "ok": false,
+     "refusable": true,
+     "results": [
+      {
+       "id": "L0",
+       "pass": false,
+       "too_broad": true
+      },
+      {
+       "id": "L1",
+       "pass": false,
+       "too_broad": true
+      }
+     ],
+     "pre_sig": "f8d1a0fab2d998e6d7bf3a7c04ddc70a73cbd35cc5e062584e0bc40b2c901f05",
+     "tier": "cheap",
+     "coverage_gaps": [],
+     "injection": [],
+     "at": "2026-09-17T14:40:35+00:00"
+    },
+    {
+     "kind": "verify",
+     "ok": false,
+     "refusable": true,
+     "results": [
+      {
+       "id": "L0",
+       "pass": true,
+       "oracle_exit": 0,
+       "oracle_ok": true,
+       "mutants": {
+        "total": 0,
+        "killed": 0
+       },
+       "judge": "deepseek/deepseek-v4-flash-0731",
+       "control": "passed"
+      },
+      {
+       "id": "L1",
+       "pass": false,
+       "oracle_exit": 0,
+       "oracle_ok": true,
+       "mutants": {
+        "total": 0,
+        "killed": 0
+       },
+       "judge": "deepseek/deepseek-v4-flash-0731",
+       "control": "passed"
+      }
+     ],
+     "pre_sig": "5e6c4f3974df51f73c80adcf521e0813ab84ead9cb2f79772c91412034c01241",
+     "tier": "cheap",
+     "coverage_gaps": [],
+     "injection": [],
+     "at": "2026-09-17T14:45:13+00:00"
     }
-  ]
+   ]
+  }
+ },
+ "deltas": [
+  {
+   "block": 2,
+   "text": "L0.test: docs publish seed->priv (the-basics) and priv->pub->address (key_expand) as SEPARATE vectors, no single seed->address example; so the law's original test wording (derive then compare to one docs seed/address) was unachievable. Corrected test wording to the piecewise chain of official vectors the tests actually assert. No change to the law statement.",
+   "at": "2026-09-13T23:56:59+00:00"
+  }
+ ],
+ "probe": {
+  "score": 96,
+  "results": [
+   {
+    "id": "L0",
+    "pass": true,
+    "evidence": "tests/test_crypto.py:46 assert priv.hex().upper() == DOCS_PRIV; :51 assert public_key(DOCS_PRIV_EXPAND).hex().upper() == DOCS_PUB_EXPAND; :56 assert address_from_public_key(bytes.fromhex(DOCS_PUB_EXPAND)) == DOCS_ADDR_EXPAND; tests/test_client.py:47 assert node_key.lower() == acct.public_key.hex()"
+   },
+   {
+    "id": "L1",
+    "pass": true,
+    "evidence": "tests/test_client.py:27 assert int(raw) > 0"
+   },
+   {
+    "id": "L2",
+    "pass": false,
+    "evidence": "Missing: no test sends a tiny self-transfer and confirms on-chain via rpc.nano.to; probe marks L2 STUCK (no funded wallet, AGENTS forbids seeking funds)."
+   },
+   {
+    "id": "L3",
+    "pass": true,
+    "evidence": "tests/test_wallet.py:63 with pytest.raises(InsufficientBalance); :78 with pytest.raises(DailyCapExceeded)"
+   },
+   {
+    "id": "L4",
+    "pass": true,
+    "evidence": "tests/test_payments.py:61 assert a != b; :68 assert a1 == a2"
+   },
+   {
+    "id": "L5",
+    "pass": true,
+    "evidence": "tests/test_payments.py:102 assert res[\"status\"] == \"approved\"; :107 assert res2[\"status\"] == \"spent\"; :108 assert svc.store.is_approved(rid); :117 assert svc.verify_payment(rid, amt)[\"status\"] == \"pending\"; :156 assert results.count(\"approved\") == 1"
+   },
+   {
+    "id": "L6",
+    "pass": true,
+    "evidence": "tests/test_probe.py:93 assert '\"approved\"' in v1text; :99 assert '\"spent\"' in uvtext"
+   },
+   {
+    "id": "L7",
+    "pass": true,
+    "evidence": "tests/test_evidence.py:39 assert should_log(EXT, own) is True; :72 assert _count_tx(db) == 0; tests/test_probe.py:106 assert log_ext is True; :107 assert log_own is False"
+   },
+   {
+    "id": "L8",
+    "pass": true,
+    "evidence": "tests/test_pricing.py:111 assert q.price_raw == usd_to_xno_raw(Decimal(\"1.00\"), Decimal(\"0.34\")); :159 assert not spy.contacted, \"quote_usd must not touch the chain\"; :220 assert len(rates) == 3; :224 assert min(rates) <= m <= max(rates)"
+   },
+   {
+    "id": "L9",
+    "pass": true,
+    "evidence": "tests/test_pricing.py:174 assert q.expires_at - 5000.0 <= 30.0; :193 assert out[\"status\"] == \"expired\"; :195 assert not store.is_approved(\"req-exp\")"
+   },
+   {
+    "id": "L10",
+    "pass": true,
+    "evidence": "tests/test_buyer.py:96 assert len(wallet.client.process_calls()) == 1; :107 assert client.process_calls() == []; :113 with pytest.raises(MandateError); :123 with pytest.raises(ExpiredMandate); :134 with pytest.raises(MandateError)"
+   },
+   {
+    "id": "L11",
+    "pass": true,
+    "evidence": "tests/test_buyer.py:145 assert client.process_calls() == []; :155 assert client.process_calls() == []; :165 assert client.process_calls() == []; :173 assert len(client.process_calls()) == 1"
+   },
+   {
+    "id": "L12",
+    "pass": true,
+    "evidence": "tests/test_scorecard.py:175 assert \"verify PASS\" in rv.stdout; :112 assert problems == []; :120 ok, problems = verify(RAW, _write_published(published), j, _own()); :121 assert ok is False"
+   },
+   {
+    "id": "L13",
+    "pass": true,
+    "evidence": "tests/test_scorecard.py:71 expected_share = 1 / (165_000_000 + 1); :72 assert published[\"nano\"][\"share_of_observed\"] == pytest.approx(expected_share); :82 assert p_own[\"nano\"][\"share_of_observed\"] == p_empty[\"nano\"][\"share_of_observed\"] == 0.0; :102 assert [r[\"payer\"] for r in receipts] == [EXT]"
+   },
+   {
+    "id": "L14",
+    "pass": true,
+    "evidence": "tests/test_x402_draft.py:52 assert SPEC.is_file(); :77 assert acc[\"network\"] == \"nano:live\"; :90 assert \"at least two independent\" in flat and \"RPC endpoints\" in flat; :96 assert \"claim\" in text.lower() and \"exactly once\" in text.lower(); :103 # withdrawn. The spec draft still exists; :114 assert \"PR opened\" not in text or \"withdrawn\" in text"
+   },
+   {
+    "id": "L15",
+    "pass": true,
+    "evidence": "tests/test_x402_draft_refimpl.py:65 assert re.search(r\"implements SchemeNetworkClient\", texts[\"client\"]); :66 assert re.search(r\"implements SchemeNetworkServer\", texts[\"server\"]); :67 assert re.search(r\"implements SchemeNetworkFacilitator\", texts[\"facilitator\"]); :87 assert \"fails closed\" in flat.lower() or \"fail closed\" in flat.lower(); :96 assert \"claimStore.claim\" in fac; :114 assert \"error TS\" not in r.stdout; :132 assert \"PR opened\" not in text or \"withdrawn\" in text"
+   },
+   {
+    "id": "L16",
+    "pass": true,
+    "evidence": "tests/test_facilitator.py:127 assert fac.supported()[\"scheme\"] == \"exact\"; :128 assert fac.supported()[\"network\"] == \"nano:live\"; :131 assert callable(fac.verify) and callable(fac.settle); :311 assert r.status_code == 200; :314 assert body[\"network\"] == \"nano:live\"; :139 assert res[\"extra\"][\"confirmedOn\"] == 2; :149 # fail-closed; :162 assert \"fail-closed\" in res[\"invalidMessage\"]; :322 assert r.json()[\"isValid\"] is True"
+   },
+   {
+    "id": "L17",
+    "pass": true,
+    "evidence": "tests/test_facilitator.py:215 assert s1[\"success\"] is True; :254 assert s[\"errorReason\"] == \"unconfirmed\"; :257 def test_l17_claim_store_persists_exactly_once_across_instances; :282 assert results.count(True) == 1; :334 assert s2[\"errorReason\"] == \"duplicate\""
+   },
+   {
+    "id": "L18",
+    "pass": true,
+    "evidence": "tests/test_facilitator_live.py:157 assert res.confirmed_on == 2; :156 assert res.ok is True, f\"live 2-RPC verification failed: {res.reason}\"; :158 assert res.consulted == 2; :128 assert res.ok is False"
+   },
+   {
+    "id": "L19",
+    "pass": true,
+    "evidence": "tests/test_httpx402.py:180 assert first.status_code == 402; :181 assert PAYMENT_REQUIRED_HEADER in first.headers; :195 assert second.status_code == 200; :196 assert '\"the protected result\"' in second.text; :199 assert settle[\"success\"] is True"
+   },
+   {
+    "id": "L20",
+    "pass": true,
+    "evidence": "tests/test_httpx402.py:242 assert replay.status_code == 402; :243 assert \"the protected result\" not in replay.text"
+   },
+   {
+    "id": "L21",
+    "pass": true,
+    "evidence": "tests/test_paidtool.py:206 assert second[\"success\"] is False; :207 assert \"result\" not in second; :201 assert first[\"success\"] is True"
+   },
+   {
+    "id": "L22",
+    "pass": true,
+    "evidence": "tests/test_paidtool.py:181 assert out[\"result\"][\"data\"] == \"the protected tool result\"; :182 assert out[\"settlement\"][\"success\"] is True; :129 assert r1[\"pay_to\"] != r2[\"pay_to\"]; :130 assert r1[\"pay_to\"].startswith(\"nano_\"); :222 assert out[\"success\"] is False; :240 assert out[\"success\"] is False; :257 assert out[\"success\"] is False"
+   },
+   {
+    "id": "L23",
+    "pass": true,
+    "evidence": "tests/test_journaldb.py:62 assert rows[0][\"payer\"] == EXT; :57 assert ok_ext is True and ok_own is False; :79 assert [r[\"payer\"] for r in receipts] == [EXT]; :92 assert published[\"nano\"][\"external_receipts\"] == 1; :123 assert \"verify PASS\" in rv.stdout; :140 with pytest.raises(sqlite3.OperationalError)"
+   },
+   {
+    "id": "L24",
+    "pass": true,
+    "evidence": "tests/test_wallet.py:126 assert proc[\"subtype\"] == \"receive\"; :127 assert proc[\"block\"][\"link\"] == src.upper(); :129 assert proc[\"block\"][\"balance\"] == str(...); :158 assert wg[\"hash\"] == acct.public_key.hex(); :161 assert proc[\"block\"][\"previous\"] == \"0\" * 64; tests/test_block.py:55 assert h.hex().upper() == expected_hash; tests/test_wallet.py:139 with pytest.raises(ValueError)"
+   }
+  ],
+  "at": "2026-09-14T17:03:24+00:00"
+ },
+ "waivers": [],
+ "contested": [],
+ "events": [
+  {
+   "kind": "owner_cleanup",
+   "payload": {
+    "blocks": [
+     "3",
+     "4",
+     "5",
+     "6",
+     "7",
+     "8",
+     "10",
+     "11",
+     "12",
+     "13",
+     "14",
+     "15",
+     "16",
+     "17",
+     "18"
+    ],
+    "laws": [
+     "L2",
+     "L3",
+     "L4",
+     "L5",
+     "L6",
+     "L7",
+     "L8",
+     "L9",
+     "L10",
+     "L11",
+     "L12",
+     "L13",
+     "L14",
+     "L15",
+     "L16",
+     "L17",
+     "L18",
+     "L19",
+     "L20",
+     "L21",
+     "L22",
+     "L23",
+     "L24",
+     "L25",
+     "L26"
+    ],
+    "reason": "Owner 2026-09-15: old Nano-internal milestones removed; Rai works outside the Nano ecosystem, reusing existing hub.nano.org tools."
+   },
+   "at": "2026-09-14T22:18:12+00:00",
+   "prev": "genesis",
+   "receipt": "291a705034f83653e2c06c417dc653e9f6c2059ec95ebc50e32b09cac02559f7"
+  },
+  {
+   "kind": "amend",
+   "payload": {
+    "id": "L0",
+    "version": 2
+   },
+   "at": "2026-09-17T14:23:00+00:00",
+   "prev": "291a705034f83653e2c06c417dc653e9f6c2059ec95ebc50e32b09cac02559f7",
+   "receipt": "62f29edb67df15d98bcc748888eee0bbfd1468c65dc8b64a5208369e6327ba7c"
+  },
+  {
+   "kind": "amend",
+   "payload": {
+    "id": "L0",
+    "version": 3
+   },
+   "at": "2026-09-17T14:23:20+00:00",
+   "prev": "62f29edb67df15d98bcc748888eee0bbfd1468c65dc8b64a5208369e6327ba7c",
+   "receipt": "972185ea99ac545ad8490c78b66d20c74b67e2f1aabd34048382bb1b5ddf7459"
+  },
+  {
+   "kind": "amend",
+   "payload": {
+    "id": "L1",
+    "version": 2
+   },
+   "at": "2026-09-17T14:23:21+00:00",
+   "prev": "972185ea99ac545ad8490c78b66d20c74b67e2f1aabd34048382bb1b5ddf7459",
+   "receipt": "1dc9498a238e9d01594887648c298fe1187af9192ec4b582b0be92f1b9696ab1"
+  },
+  {
+   "kind": "verify",
+   "payload": {
+    "block": "2",
+    "ok": false
+   },
+   "at": "2026-09-17T14:31:48+00:00",
+   "prev": "1dc9498a238e9d01594887648c298fe1187af9192ec4b582b0be92f1b9696ab1",
+   "receipt": "1b88ceb91aa3beb0e1897446c6cb3fbcf5a844fdb1adf182385a4e064d38a7d7"
+  },
+  {
+   "kind": "verify",
+   "payload": {
+    "block": "2",
+    "ok": false
+   },
+   "at": "2026-09-17T14:39:45+00:00",
+   "prev": "1b88ceb91aa3beb0e1897446c6cb3fbcf5a844fdb1adf182385a4e064d38a7d7",
+   "receipt": "eb3455574a0c4caec2fca7f00397d971431a39d7f9c02c05c4d47b163dcc6bb4"
+  },
+  {
+   "kind": "verify",
+   "payload": {
+    "block": "2",
+    "ok": false
+   },
+   "at": "2026-09-17T14:40:35+00:00",
+   "prev": "eb3455574a0c4caec2fca7f00397d971431a39d7f9c02c05c4d47b163dcc6bb4",
+   "receipt": "e327aa195acd35ba5b9686cf09ba71a02c68bc09289a2c1aff838479baa8f918"
+  },
+  {
+   "kind": "verify",
+   "payload": {
+    "block": "2",
+    "ok": false
+   },
+   "at": "2026-09-17T14:45:13+00:00",
+   "prev": "e327aa195acd35ba5b9686cf09ba71a02c68bc09289a2c1aff838479baa8f918",
+   "receipt": "70c6e512635fd771d67b83860d63bdf649c7d94a45fa04ab71e741856c0e4050"
+  }
+ ]
 }
